@@ -15,12 +15,16 @@ public class WeatherServiceTest {
     @Test
     public void testGetWeatherOfTheCity() throws Exception{
         //Given
-        Mockito.when(webUtils.getPageContents(Mockito.anyString())).thenReturn("{\"coord\":{\"lon\":2.3488,\"lat\":48.8534},\"weather\":[{\"id\":500,\"main\":\"Rain\",\"description\":\"légère pluie\",\"icon\":\"10d\"}],\"base\":\"stations\",\"main\":{\"temp\":286.82,\"feels_like\":285.97,\"temp_min\":284.41,\"temp_max\":288.58,\"pressure\":1019,\"humidity\":66},\"visibility\":10000,\"wind\":{\"speed\":0.89,\"deg\":217,\"gust\":10.28},\"rain\":{\"1h\":0.15},\"clouds\":{\"all\":75},\"dt\":1621938919,\"sys\":{\"type\":2,\"id\":2012208,\"country\":\"FR\",\"sunrise\":1621915050,\"sunset\":1621971476},\"timezone\":7200,\"id\":2988507,\"name\":\"Paris\",\"cod\":200}");
+        Mockito.when(webUtils.getPageContents(Mockito.anyString())).thenReturn("{\"coord\":{\"lon\":2.3488,\"lat\":48.8534},\"weather\":[{\"id\":803,\"main\":\"Clouds\",\"description\":\"nuageux\",\"icon\":\"04d\"}],\"base\":\"stations\",\"main\":{\"temp\":288.05,\"feels_like\":287.35,\"temp_min\":286.08,\"temp_max\":289.92,\"pressure\":1018,\"humidity\":67},\"visibility\":10000,\"wind\":{\"speed\":4.02,\"deg\":224,\"gust\":9.83},\"clouds\":{\"all\":75},\"dt\":1621950361,\"sys\":{\"type\":2,\"id\":2012208,\"country\":\"FR\",\"sunrise\":1621915050,\"sunset\":1621971476},\"timezone\":7200,\"id\":2988507,\"name\":\"Paris\",\"cod\":200}");
         //When
-        Weather quote = new CitationService(webUtils).getQuoteOfTheDay();
+        Weather weather = new WeatherService(webUtils).getWeatherOfTheCity("Paris");
         //Then
-        Assertions.assertThat(quote).isNotNull();
-        Assertions.assertThat(quote.getQuote()).isEqualTo("Your success will not be determined by your gender or your ethnicity, but only on the scope of your dreams and your hard work to achieve them.");
-        Assertions.assertThat(quote.getAuthor()).isEqualTo("Zaha Hadidd");
+        Assertions.assertThat(weather).isNotNull();
+        Assertions.assertThat(weather.getSunsetDate()).isEqualTo("21:37");
+        Assertions.assertThat(weather.getsunriseDate()).isEqualTo("5:57");
+        Assertions.assertThat(weather.getDescription()).isEqualTo("nuageux");
+        Assertions.assertThat(weather.getHumidity()).isEqualTo(67);
+        Assertions.assertThat(weather.getTemp()).isEqualTo(288.05);
+        Assertions.assertThat(weather.getId()).isEqualTo(803);
     }
 }
