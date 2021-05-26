@@ -44,9 +44,12 @@ public class WeatherServiceTest {
     }
 
     @Test
+    /**
+     * Case : city not found
+     */
     public void testGetWeatherOfTheCityError404() throws Exception{
         //Given
-        Mockito.when(webUtils.getPageContents(Mockito.anyString())).thenReturn("{\"cod\":\"404\",\"message\":\"city not found\"}");
+        Mockito.when(webUtils.getPageContents(Mockito.anyString())).thenReturn("{\"cod\":404,\"message\":\"city not found\"}");
         //When
         try {
             Weather weather = new WeatherService(webUtils).getWeatherOfTheCity("Paris");

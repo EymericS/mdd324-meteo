@@ -26,14 +26,16 @@ public class WeatherService {
         this.webUtils = webUtils;
     }
 
-    public void callExternalAPI() throws IOException {
+    public void callExternalAPI() throws Exception {
+        // Quelle exception ?
         final String urlApi = apiEndPoint + '?' +
                 "appid=" + apiKey +
                 "&lang="  + lang +
                 "&units=" + units +
                 "&q=" + city;
 
-            contenu = webUtils.getPageContents(urlApi);
+        contenu = webUtils.getPageContents(urlApi);
+        System.out.println(contenu);
     }
 
     /**
@@ -73,14 +75,18 @@ public class WeatherService {
             }
         }
 
+        System.out.println("test");
+
         if (contenu == null){
             throw new Exception("Contenu vide");
         }
 
-
-
         //Récuperation des valeurs
         JsonObject JsonObject = new JsonParser().parse(contenu).getAsJsonObject();
+        int httpResponseCode = JsonObject.get("cod").getAsJsonObject().getAsInt();
+        if (httpResponseCode != 200)
+            throw new Exception("Response code != 200 !");
+
         JsonArray weather = JsonObject.getAsJsonArray("weather");
         JsonObject sys = JsonObject.get("sys").getAsJsonObject();
         JsonObject main = JsonObject.get("main").getAsJsonObject();
