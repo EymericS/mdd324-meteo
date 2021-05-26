@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 @ExtendWith(MockitoExtension.class)
 public class WeatherServiceTest {
@@ -20,11 +22,64 @@ public class WeatherServiceTest {
         Weather weather = new WeatherService(webUtils).getWeatherOfTheCity("Paris");
         //Then
         Assertions.assertThat(weather).isNotNull();
-        Assertions.assertThat(weather.getSunsetDate()).isEqualTo("21:37");
-        Assertions.assertThat(weather.getsunriseDate()).isEqualTo("5:57");
-        Assertions.assertThat(weather.getDescription()).isEqualTo("couvert");
-        Assertions.assertThat(weather.getHumidity()).isEqualTo(58);
+        Assertions.assertThat(weather.getCoucher()).isEqualTo("21:37");
+        Assertions.assertThat(weather.getLever()).isEqualTo("5:57");
+        Assertions.assertThat(weather.getTemps()).isEqualTo("couvert");
+        Assertions.assertThat(weather.getHumidite()).isEqualTo(58);
         Assertions.assertThat(weather.getTemp()).isEqualTo(15.22);
-        Assertions.assertThat(weather.getId()).isEqualTo(804);
+        Assertions.assertThat(weather.getIcon()).isEqualTo(804);
+    }
+
+    @Test
+    public void testGetWeatherOfTheCityError401() throws Exception{
+        //Given
+        Mockito.when(webUtils.getPageContents(Mockito.anyString())).thenReturn("{\"cod\":401, \"message\": \"Invalid API key. Please see http://openweathermap.org/faq#error401 for more info.\"}");
+        //When
+        try {
+            Weather weather = new WeatherService(webUtils).getWeatherOfTheCity("Paris");
+        } catch (Exception e) {
+            Assertions.assertThat(e).isInstanceOf(Exception.class);
+            Assertions.assertThat(e.getMessage()).isEqualTo("Mauvaise clé API");
+        }
+    }
+
+    @Test
+    public void testGetWeatherOfTheCityError404() throws Exception{
+        //Given
+        Mockito.when(webUtils.getPageContents(Mockito.anyString())).thenReturn("{\"cod\":\"404\",\"message\":\"city not found\"}");
+        //When
+        try {
+            Weather weather = new WeatherService(webUtils).getWeatherOfTheCity("Paris");
+        } catch (Exception e) {
+            Assertions.assertThat(e).isInstanceOf(Exception.class);
+            Assertions.assertThat(e.getMessage()).isEqualTo("Ville pas trouvé");
+        }
+    }
+
+    @Test
+    @MockitoSettings(strictness = Strictness.LENIENT)
+    public void testGetWeatherOfTheCityError400() throws Exception{
+        //Given
+        Mockito.when(webUtils.getPageContents(Mockito.anyString())).thenReturn(null);
+        //When
+        try {
+            Weather weather = new WeatherService(webUtils).getWeatherOfTheCity(null);
+        } catch (Exception e) {
+            Assertions.assertThat(e).isInstanceOf(Exception.class);
+            Assertions.assertThat(e.getMessage()).isEqualTo("Pas de ville");
+        }
+    }
+
+    @Test
+    public void testGetWeatherOfTheCityErrorContenuNull() throws Exception{
+        //Given
+        Mockito.when(webUtils.getPageContents(Mockito.anyString())).thenReturn(null);
+        //When
+        try {
+            Weather weather = new WeatherService(webUtils).getWeatherOfTheCity("Paris");
+        } catch (Exception e) {
+            Assertions.assertThat(e).isInstanceOf(Exception.class);
+            Assertions.assertThat(e.getMessage()).isEqualTo("Contenu vide");
+        }
     }
 }

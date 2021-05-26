@@ -1,64 +1,64 @@
 package com.ipiecoles;
 
 public class Weather {
-    private String sunsetDate;
-    private Integer humidity;
-    private Integer id;
-    private String sunriseDate;
+    private String coucher;
+    private Integer humidite;
+    private Integer icon;
+    private String lever;
     private Double temp;
-    private String description;
+    private String temps;
 
     @Override
     public String toString() {
         return "Weather{" +
-                "sunsetDate='" + sunsetDate + '\'' +
-                ", humidity=" + humidity +
-                ", id=" + id +
-                ", sunriseDate='" + sunriseDate + '\'' +
+                "coucher='" + coucher + '\'' +
+                ", humidite=" + humidite +
+                ", icon=" + icon +
+                ", lever='" + lever + '\'' +
                 ", temp=" + temp +
-                ", description='" + description + '\'' +
+                ", temps='" + temps + '\'' +
                 '}';
     }
 
-    public Weather(String sunsetDate, Integer humidity, Integer id, String sunriseDate, Double temp, String description) {
-        this.sunsetDate = sunsetDate;
-        this.humidity = humidity;
-        this.id = id;
-        this.sunriseDate = sunriseDate;
+    public Weather(String coucher, Integer humidite, Integer icon, String lever, Double temp, String temps) {
+        this.coucher = coucher;
+        this.humidite = humidite;
+        this.icon = icon;
+        this.lever = lever;
         this.temp = temp;
-        this.description = description;
+        this.temps = temps;
     }
 
-    public String getSunsetDate() {
-        return sunsetDate;
+    public String getCoucher() {
+        return coucher;
     }
 
-    public void setSunsetDate(String sunsetDate) {
-        this.sunsetDate = sunsetDate;
+    public void setCoucher(String coucher) {
+        this.coucher = coucher;
     }
 
-    public Integer getHumidity() {
-        return humidity;
+    public Integer getHumidite() {
+        return humidite;
     }
 
-    public void setHumidity(Integer humidity) {
-        this.humidity = humidity;
+    public void setHumidite(Integer humidite) {
+        this.humidite = humidite;
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getIcon() {
+        return icon;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setIcon(Integer icon) {
+        this.icon = icon;
     }
 
-    public String getsunriseDate() {
-        return sunriseDate;
+    public String getLever() {
+        return lever;
     }
 
-    public void setsunriseDate(String sunriseDate) {
-        this.sunriseDate = sunriseDate;
+    public void setLever(String lever) {
+        this.lever = lever;
     }
 
     public Double getTemp() {
@@ -69,11 +69,11 @@ public class Weather {
         this.temp = temp;
     }
 
-    public String getDescription() {
-        return description;
+    public String getTemps() {
+        return temps;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setTemps(String temps) {
+        this.temps = temps;
     }
 }

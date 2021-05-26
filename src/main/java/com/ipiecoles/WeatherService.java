@@ -13,7 +13,7 @@ import java.util.Date;
 public class WeatherService {
 
     private final String apiEndPoint = "https://api.openweathermap.org/data/2.5/weather";
-    private final String apiKey = "5dfc2a06c8157403e9107053a73aca92";
+    private final String apiKey = "5dfc2a06c8157403e9107053a73aca92t";
     private final String lang = "fr";
     private final String units = "Metric";
     private String city = null;
@@ -26,17 +26,14 @@ public class WeatherService {
         this.webUtils = webUtils;
     }
 
-    public void callExternalAPI(){
+    public void callExternalAPI() throws IOException {
         final String urlApi = apiEndPoint + '?' +
                 "appid=" + apiKey +
                 "&lang="  + lang +
                 "&units=" + units +
                 "&q=" + city;
-        try {
+
             contenu = webUtils.getPageContents(urlApi);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -56,14 +53,30 @@ public class WeatherService {
     public Weather getWeatherOfTheCity(String city) throws Exception {
 
         //Appel à l'API
+        if (city == null || city.isEmpty()) {
+            throw new Exception("Pas de ville");
+        }
         this.city = city;
-        callExternalAPI();
+        try {
+            System.out.println("beforeCall");
+            callExternalAPI();
+            System.out.println("afterCall");
+        } catch (Exception exception) {
+            System.out.println("message" + exception.getMessage());
+            String codeErreur = exception.getMessage().substring(36,39);
+            if (codeErreur.equals("401")) {
+                throw new Exception("Mauvaise clé API");
+            }
+
+            if (codeErreur.equals("404")) {
+                throw new Exception("Ville pas trouvé");
+            }
+        }
 
         if (contenu == null){
             throw new Exception("Contenu vide");
         }
 
-        //Je gère les erreurs
 
 
         //Récuperation des valeurs
