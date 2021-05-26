@@ -13,7 +13,7 @@ import java.util.Date;
 public class WeatherService {
 
     private final String apiEndPoint = "https://api.openweathermap.org/data/2.5/weather";
-    private final String apiKey = "5dfc2a06c8157403e9107053a73aca92t";
+    private final String apiKey = "5dfc2a06c8157403e9107053a73aca92";
     private final String lang = "fr";
     private final String units = "Metric";
     private String city = null;
@@ -35,7 +35,7 @@ public class WeatherService {
                 "&q=" + city;
 
         contenu = webUtils.getPageContents(urlApi);
-        System.out.println(contenu);
+        //System.out.println(contenu);
     }
 
     /**
@@ -60,11 +60,12 @@ public class WeatherService {
         }
         this.city = city;
         try {
-            System.out.println("beforeCall");
             callExternalAPI();
-            System.out.println("afterCall");
         } catch (Exception exception) {
-            System.out.println("message" + exception.getMessage());
+            System.out.println(exception.getSuppressed());
+            System.out.println(exception.getCause());
+            System.out.println(exception.getLocalizedMessage());
+            System.out.println(exception.getMessage());
             String codeErreur = exception.getMessage().substring(36,39);
             if (codeErreur.equals("401")) {
                 throw new Exception("Mauvaise clé API");
@@ -75,17 +76,22 @@ public class WeatherService {
             }
         }
 
-        System.out.println("test");
-
         if (contenu == null){
             throw new Exception("Contenu vide");
         }
 
         //Récuperation des valeurs
         JsonObject JsonObject = new JsonParser().parse(contenu).getAsJsonObject();
-        int httpResponseCode = JsonObject.get("cod").getAsJsonObject().getAsInt();
-        if (httpResponseCode != 200)
-            throw new Exception("Response code != 200 !");
+        int httpResponseCode = JsonObject.get("cod").getAsInt();
+        if (httpResponseCode != 200){
+            if (httpResponseCode == 401) {
+                throw new Exception("Mauvaise clé API");
+            }
+
+            if (httpResponseCode == 404) {
+                throw new Exception("Ville pas trouvé");
+            }
+        }
 
         JsonArray weather = JsonObject.getAsJsonArray("weather");
         JsonObject sys = JsonObject.get("sys").getAsJsonObject();
