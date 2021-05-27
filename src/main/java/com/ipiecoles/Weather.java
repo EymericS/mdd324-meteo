@@ -1,5 +1,19 @@
 package com.ipiecoles;
 
+/**
+ * Méthode allant chercher la météo dans une ville donnée
+ *
+ * @return la météo actuelle de la ville donnée sous forme d'une chaîne de caractère
+ * représentant un objet JSON :
+ * {
+ * "coucher":"15:53",
+ * "humidite":70,
+ * "icon":803,
+ * "lever":"07:31",
+ * "temp":8.13,
+ * "temps":"nuageux"
+ * }
+ */
 public class Weather {
     private String coucher;
     private Integer humidite;
@@ -8,16 +22,14 @@ public class Weather {
     private Double temp;
     private String temps;
 
-    @Override
-    public String toString() {
-        return "Weather{" +
-                "coucher='" + coucher + '\'' +
-                ", humidite=" + humidite +
-                ", icon=" + icon +
-                ", lever='" + lever + '\'' +
-                ", temp=" + temp +
-                ", temps='" + temps + '\'' +
-                '}';
+
+    public Weather() {
+        this.coucher = null;
+        this.humidite = null;
+        this.icon = null;
+        this.lever = null;
+        this.temp = null;
+        this.temps = null;
     }
 
     public Weather(String coucher, Integer humidite, Integer icon, String lever, Double temp, String temps) {
@@ -75,5 +87,18 @@ public class Weather {
 
     public void setTemps(String temps) {
         this.temps = temps;
+    }
+
+    @Override
+    public String toString() {
+        return
+            "{" +
+                "coucher:'" + coucher + "\'," +
+                "humidite:" + humidite + "," +
+                "icon:" + icon + "," +
+                "lever:'" + lever + "\'," +
+                "temp:" + temp + "," +
+                "temps='" + temps + "\'" +
+            "}";
     }
 }

@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="mdd324-meteo" target="13" />
+      <module name="mdd324-meteo" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>

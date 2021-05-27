@@ -1,13 +1,26 @@
 package com.ipiecoles;
 
 public class WeatherRequest {
-    private String ville;
 
-    public String getVille() {
-        return ville;
+    private String city;
+
+    public WeatherRequest() {
+        this.city = null;
     }
 
-    public void setVille(String ville) {
-        this.ville = ville;
+    public WeatherRequest(String city) {
+        this.city = city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public boolean isProperlySet() {
+        return getCity() != null && !getCity().isEmpty();
     }
 }

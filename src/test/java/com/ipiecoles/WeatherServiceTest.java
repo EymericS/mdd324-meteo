@@ -23,7 +23,7 @@ public class WeatherServiceTest {
         //Then
         Assertions.assertThat(weather).isNotNull();
         Assertions.assertThat(weather.getCoucher()).isEqualTo("21:37");
-        Assertions.assertThat(weather.getLever()).isEqualTo("5:57");
+        Assertions.assertThat(weather.getLever()).isEqualTo("05:57");
         Assertions.assertThat(weather.getTemps()).isEqualTo("couvert");
         Assertions.assertThat(weather.getHumidite()).isEqualTo(58);
         Assertions.assertThat(weather.getTemp()).isEqualTo(15.22);
@@ -37,9 +37,10 @@ public class WeatherServiceTest {
         //When
         try {
             Weather weather = new WeatherService(webUtils).getWeatherOfTheCity("Paris");
-        } catch (Exception e) {
-            Assertions.assertThat(e).isInstanceOf(Exception.class);
-            Assertions.assertThat(e.getMessage()).isEqualTo("Mauvaise clé API");
+        } catch (WeatherException exception) {
+            Assertions.assertThat(exception).isInstanceOf(WeatherException.class);
+            Assertions.assertThat(exception.getMessage())
+                    .isEqualTo(WeatherException.exceptionMessage(exception.get_type()));
         }
     }
 
@@ -53,9 +54,10 @@ public class WeatherServiceTest {
         //When
         try {
             Weather weather = new WeatherService(webUtils).getWeatherOfTheCity("Paris");
-        } catch (Exception e) {
-            Assertions.assertThat(e).isInstanceOf(Exception.class);
-            Assertions.assertThat(e.getMessage()).isEqualTo("Ville pas trouvé");
+        } catch (WeatherException exception) {
+            Assertions.assertThat(exception).isInstanceOf(WeatherException.class);
+            Assertions.assertThat(exception.getMessage())
+                    .isEqualTo(WeatherException.exceptionMessage(exception.get_type()));
         }
     }
 
@@ -67,9 +69,10 @@ public class WeatherServiceTest {
         //When
         try {
             Weather weather = new WeatherService(webUtils).getWeatherOfTheCity(null);
-        } catch (Exception e) {
-            Assertions.assertThat(e).isInstanceOf(Exception.class);
-            Assertions.assertThat(e.getMessage()).isEqualTo("Pas de ville");
+        } catch (WeatherException exception) {
+            Assertions.assertThat(exception).isInstanceOf(WeatherException.class);
+            Assertions.assertThat(exception.getMessage())
+                    .isEqualTo(WeatherException.exceptionMessage(exception.get_type()));
         }
     }
 
@@ -80,9 +83,10 @@ public class WeatherServiceTest {
         //When
         try {
             Weather weather = new WeatherService(webUtils).getWeatherOfTheCity("Paris");
-        } catch (Exception e) {
-            Assertions.assertThat(e).isInstanceOf(Exception.class);
-            Assertions.assertThat(e.getMessage()).isEqualTo("Contenu vide");
+        } catch (WeatherException exception) {
+            Assertions.assertThat(exception).isInstanceOf(WeatherException.class);
+            Assertions.assertThat(exception.getMessage())
+                    .isEqualTo(WeatherException.exceptionMessage(exception.get_type()));
         }
     }
 }

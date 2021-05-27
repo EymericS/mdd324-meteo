@@ -1,18 +1,8 @@
 package com.ipiecoles;
 
 public class Main {
-    public static void main (String[] args){
-        /*
-        String city = "Paris";
 
-        try {
-            System.out.println(new WeatherService().getWeatherOfTheCity(city).toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-        } */
-        WeatherRequest weatherRequest = new WeatherRequest();
-        weatherRequest.setVille("Lyongagagagga");
-        System.out.println(new Handler().handleRequest(weatherRequest, null));
-        //System.out.println(Date.from(Instant.ofEpochSecond(1621971476)).getHours() + ":" + Date.from(Instant.ofEpochSecond(1621971476)).getMinutes());
+    public static void main (String[] args){
+
     }
 }

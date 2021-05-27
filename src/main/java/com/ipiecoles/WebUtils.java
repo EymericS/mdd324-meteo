@@ -22,6 +22,7 @@ public class WebUtils {
                 br.close();
             }
         }
+
         return lines.toString();
     }
 }

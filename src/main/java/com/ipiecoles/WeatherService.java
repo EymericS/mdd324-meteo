@@ -3,11 +3,15 @@ package com.ipiecoles;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Date;
 
 public class WeatherService {
@@ -16,96 +20,92 @@ public class WeatherService {
     private final String apiKey = "5dfc2a06c8157403e9107053a73aca92";
     private final String lang = "fr";
     private final String units = "Metric";
-    private String city = null;
-    private String contenu = null;
+    private WebUtils webUtils;
 
-    private WebUtils webUtils = new WebUtils();
-    public WeatherService() {}
+    public WeatherService() {
+        this.webUtils = new WebUtils();
+    }
 
     public WeatherService(WebUtils webUtils) {
         this.webUtils = webUtils;
     }
 
-    public void callExternalAPI() throws Exception {
-        // Quelle exception ?
-        final String urlApi = apiEndPoint + '?' +
+    /**
+     * Create and make call to external api and return content
+     * @param city String
+     * @return content JsonObject
+     */
+    private JsonObject callExternalAPI(String city) throws Exception {
+        final String url = apiEndPoint + '?' +
                 "appid=" + apiKey +
                 "&lang="  + lang +
                 "&units=" + units +
                 "&q=" + city;
 
-        contenu = webUtils.getPageContents(urlApi);
-        //System.out.println(contenu);
+        String pageContent = null;
+        pageContent = webUtils.getPageContents(url);
+        JsonObject result = new JsonParser().parse(pageContent).getAsJsonObject();
+
+        return result;
     }
 
     /**
-     * Méthode allant chercher la météo dans une ville donnée
-     *
-     * @return la météo actuelle de la ville donnée sous forme d'une chaîne de caractère
-     * représentant un objet JSON :
-     * {
-     *     "coucher":"15:53",
-     *     "humidite":70,
-     *     "icon":803,
-     *     "lever":"07:31",
-     *     "temp":8.13,
-     *     "temps":"nuageux"
-     * }
+     * Create a weather instance from external API ressource
+     * @param city String
+     * @return Weather
      */
-    public Weather getWeatherOfTheCity(String city) throws Exception {
+    public Weather getWeatherOfTheCity(String city) throws WeatherException {
+        if(city == null || city.isEmpty()) throw new WeatherException(WeatherException.TYPE.NO_CITY, 400);
 
-        //Appel à l'API
-        if (city == null || city.isEmpty()) {
-            throw new Exception("Pas de ville");
-        }
-        this.city = city;
-        try {
-            callExternalAPI();
-        } catch (Exception exception) {
-            System.out.println(exception.getSuppressed());
-            System.out.println(exception.getCause());
-            System.out.println(exception.getLocalizedMessage());
-            System.out.println(exception.getMessage());
-            String codeErreur = exception.getMessage().substring(36,39);
-            if (codeErreur.equals("401")) {
-                throw new Exception("Mauvaise clé API");
-            }
-
-            if (codeErreur.equals("404")) {
-                throw new Exception("Ville pas trouvé");
-            }
+        JsonObject responseBody = null;
+        try{
+            responseBody = callExternalAPI(city);
+        } catch (Exception exception){
+            throw new WeatherException(WeatherException.TYPE.CITY_NOT_FOUND, 404);
         }
 
-        if (contenu == null){
-            throw new Exception("Contenu vide");
-        }
+        if(responseBody == null) throw new WeatherException(WeatherException.TYPE.UNKNOWN_EXTERNAL_ERROR);
 
-        //Récuperation des valeurs
-        JsonObject JsonObject = new JsonParser().parse(contenu).getAsJsonObject();
-        int httpResponseCode = JsonObject.get("cod").getAsInt();
+        int httpResponseCode = responseBody.get("cod").getAsInt();
         if (httpResponseCode != 200){
-            if (httpResponseCode == 401) {
-                throw new Exception("Mauvaise clé API");
-            }
-
-            if (httpResponseCode == 404) {
-                throw new Exception("Ville pas trouvé");
+            switch(httpResponseCode) {
+                case 400: throw new WeatherException(WeatherException.TYPE.NO_CITY, httpResponseCode);
+                case 401: throw new WeatherException(WeatherException.TYPE.WRONG_EXTERNAL_API_KEY, httpResponseCode);
+                case 404: throw new WeatherException(WeatherException.TYPE.CITY_NOT_FOUND, httpResponseCode);
+                default: throw new WeatherException(WeatherException.TYPE.UNHANDLE_HTTP_CODE);
             }
         }
 
-        JsonArray weather = JsonObject.getAsJsonArray("weather");
-        JsonObject sys = JsonObject.get("sys").getAsJsonObject();
-        JsonObject main = JsonObject.get("main").getAsJsonObject();
+        return createWeatherFromStructuredJSON(responseBody);
+    }
 
-        String description = weather.get(0).getAsJsonObject().get("description").getAsString();
-        Long sunset = sys.get("sunset").getAsLong();
-        String sunsetDate = Date.from(Instant.ofEpochSecond(sunset)).getHours() + ":" + Date.from(Instant.ofEpochSecond(sunset)).getMinutes();
-        Integer humidity = main.get("humidity").getAsInt();
-        Integer id = weather.get(0).getAsJsonObject().get("id").getAsInt();
-        Long sunrise = sys.get("sunrise").getAsLong();
-        String sunriseDate = Date.from(Instant.ofEpochSecond(sunrise)).getHours() + ":" + Date.from(Instant.ofEpochSecond(sunrise)).getMinutes();
-        Double temp = main.get("temp").getAsDouble();
+    private Weather createWeatherFromStructuredJSON(JsonObject json) {
+        JsonObject JOWeather = json.getAsJsonArray("weather").get(0).getAsJsonObject();
+        JsonObject JOSys = json.get("sys").getAsJsonObject();
+        JsonObject JOMain = json.get("main").getAsJsonObject();
 
-        return new Weather(sunsetDate, humidity, id, sunriseDate, temp, description);
+        // sunset / sunrise time
+        long timestamp = JOSys.get("sunset").getAsLong();
+        SimpleDateFormat formater = new SimpleDateFormat("HH:mm");
+        Date date = new Date(timestamp*1000);
+        String sunset = formater.format(date);
+
+        timestamp = JOSys.get("sunrise").getAsLong();
+        date = new Date(timestamp*1000);
+        String sunrise = formater.format(date);
+
+        // humidite
+        int humidity = JOMain.get("humidity").getAsInt();
+
+        // icon
+        int icon = JOWeather.get("id").getAsInt();
+
+        // temp
+        Double temp = JOMain.get("temp").getAsDouble();
+
+        // temps
+        String temps = JOWeather.get("description").getAsString();
+
+        return new Weather(sunset, humidity, icon, sunrise, temp, temps);
     }
 }
