@@ -16,11 +16,13 @@ public class WeatherException extends Exception {
     public WeatherException(TYPE type, String msg) {
         super(exceptionMessage(type) + " ## " + msg);
         this.type = type;
+        this.http_status_code = 500;
     }
 
     public WeatherException(TYPE type, int status_code) {
         super(exceptionMessage(type));
         this.type = type;
+        this.http_status_code = status_code;
     }
 
     public WeatherException(TYPE type) {
